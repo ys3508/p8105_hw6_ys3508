@@ -6,10 +6,17 @@ date: "2022-12-3"
 ---
 # HW6
 ```{r}
+# install.packages('leaps')
+```
+
+```{r}
+
+
 library(tidyverse)
 library(viridis)
 library(purrr)
 library(modelr)
+library(leaps)
 
 
 knitr::opts_chunk$set(
@@ -193,8 +200,22 @@ birthweight <- birthweight %>%
                         "4" = "Puerto Rican", 
                         "8" = "Other"))
 ```
-
+check nas
 ```{r}
 sum(is.na(birthweight))
+```
+
+### Building linear regression model
+Step 1: Perform linear regression with all predictors
+```{r}
+
+lm1 <- lm(bwt ~ ., data=birthweight)
+summary(lm1)
+```
+With all of our variables included in the model, the base adjusted r² is 0.717 and the Residual Standard Error is 272.5. This relationship is significant at the P<.05 level.
+
+Step 2: Run the `regsubsets()` function on all variables.
+```{r}
+
 ```
 
