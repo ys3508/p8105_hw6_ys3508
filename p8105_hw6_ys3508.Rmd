@@ -5,10 +5,11 @@ date: "2022-12-3"
 
 ---
 # HW6
+install new package
 ```{r}
 # install.packages('leaps')
 ```
-
+load library
 ```{r}
 
 
@@ -209,13 +210,26 @@ sum(is.na(birthweight))
 Step 1: Perform linear regression with all predictors
 ```{r}
 
-lm1 <- lm(bwt ~ ., data=birthweight)
+lm1 <- lm(bwt ~ ., data = birthweight)
 summary(lm1)
 ```
 With all of our variables included in the model, the base adjusted r² is 0.717 and the Residual Standard Error is 272.5. This relationship is significant at the P<.05 level.
 
 Step 2: Run the `regsubsets()` function on all variables.
 ```{r}
+best_predictors <-
+    regsubsets(bwt ~.,
+               data = birthweight,
+               nbest = 1,      # 1 best model for each number of predictors
+               nvmax = NULL,    # NULL for no limit on number of variables
+               force.in = NULL, force.out = NULL,
+               method = "exhaustive")
+summary_best_predictors <- summary(best_predictors)
 
+```
+
+Step 3: Choose number of predictors
+```{r}
+which.max(summary_best_predictors$adjr2)
 ```
 
