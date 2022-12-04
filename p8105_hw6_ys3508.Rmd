@@ -239,3 +239,11 @@ summary_best_predictors$which[15,]
 ```
 
 The best model fit for linear regression model:`babysexmale`, `bhead`, `blength`, `fincome`,`gaweeks`,`menarche`,`mheigh`,`mrace`,`parity`,`ppbmi`,`smoken`,`wtgain`
+
+**Step 5: Run the regression model with the best predictors**
+```{r}
+best_model = lm(bwt ~  babysex + bhead + blength + fincome + gaweeks + mheight + mrace + parity + ppbmi + smoken + wtgain,
+              data=birthweight)
+summary(best_model)
+```
+
