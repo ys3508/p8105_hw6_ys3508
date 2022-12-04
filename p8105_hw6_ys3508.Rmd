@@ -100,14 +100,41 @@ homicide = homicide %>%
     victim_race = fct_relevel(victim_race, "White"),
     victim_age = as.numeric(victim_age),
     status = case_when(
-      disposition == "Closed by arrest"      ~ "resolved",
-      disposition == "Closed without arrest" ~ "unresolved",
-      disposition == "Open/No arrest"        ~ "unresolved",
-      TRUE                                   ~ ""
-    )
+      disposition == "Closed by arrest"      ~ 0,
+      disposition == "Closed without arrest" ~ 0,
+      disposition == "Open/No arrest"        ~ 1,
+)
   ) %>% 
   filter(!city_state %in% c("Dallas, TX","Phoenix, AZ","Kansas City, MO","Tulsa, AL"),
   victim_race %in% c("White","Black"))
   
+```
+
+### Fit a logistic regression
+```{r}
+logistic = homicide %>%
+    filter(city_state == "Baltimore, MD") %>% 
+    glm(status ~ victim_age + victim_race + victim_sex, data = ., family = "binomial") 
+    
+logistic %>% 
+    broom::tidy(conf.int = T) %>% 
+  mutate(OR = exp(estimate),
+         CI_lower = exp(exp(conf.low)),
+         CI_upper = exp(exp(conf.high))) %>% 
+  select(term, estimate, OR, CI_lower,CI_upper) %>% 
+  knitr::kable(digits = 3, 
+        col.names = c("Term", "Log(OR)", "Estimated adjusted OR", "CI lower bound", "CI upper bound"))
+
+```
+
+```{r}
+homicide %>%  
+  nest(df = -city_state) %>% 
+  mutate(models = map(.x = df, ~ glm(status ~ victim_age + victim_race + victim_sex, data = .x, family = "binomial")),
+    results = map(models, broom::tidy)) %>% 
+  select(city_state, results) %>% 
+   unnest(results)  
+ 
+
 ```
 
