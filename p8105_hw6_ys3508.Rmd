@@ -157,7 +157,7 @@ nest_city %>%
 
 ### Plot that shows the estimated ORs and CIs
 ```{r}
-plot <-nest_city %>% 
+plot1 <-nest_city %>% 
   mutate(city_state = fct_reorder(city_state, OR)) %>%
   ggplot(aes(x = city_state, y = OR)) +
   geom_point() +
@@ -167,10 +167,11 @@ plot <-nest_city %>%
        title = "Solving homicides comparing male victims to female victims in each city \nEstimated Adjusted OR with 95% CI") +
   theme(axis.text.x = element_text(angle = 80, hjust = 1))
 
-plot
+plot1
+
 ggsave(
-  plot,
-  filename = "figures/plot.png")
+  plot1,
+  filename = "figures/plot1.png")
 
 ```
 
@@ -245,5 +246,41 @@ The best model fit for linear regression model:`babysexmale`, `bhead`, `blength`
 best_model = lm(bwt ~  babysex + bhead + blength + fincome + gaweeks + mheight + mrace + parity + ppbmi + smoken + wtgain,
               data=birthweight)
 summary(best_model)
+```
+However, this model is chasing data points and will change a lot from one training dataset to the the next – it will be consistently wrong due to its complexity, and is therefore highly variable.
+
+**Step 6: Modify the best model based on  factors that underly birthweight**
+Choose predictors based on common sense and knowledges about birthweight from the `best_model`
+
+```{r}
+linear = lm(bwt ~  bhead + blength + gaweeks + mrace + parity + ppbmi + smoken,
+              data=birthweight)
+summary(linear)
+```
+
+### plot of model residuals against fitted values
+```{r}
+plot2 <- birthweight %>%
+  add_predictions(linear) %>% 
+  add_residuals(linear) %>% 
+  ggplot(aes(x = pred, y = resid)) +
+  geom_point() +
+  geom_line(aes(y = resid), color = "red")+
+  labs(
+    x = "Fitted value",
+    y = "Residuals",
+    lines = "Residuals",
+    title = "Residuals vs Fitted Values in Birth Weight Model"
+  )
+
+plot2
+
+ggsave(
+  plot2,
+  filename = "figures/plot2.png")
+```
+### Cross Validation
+```{r}
+
 ```
 
