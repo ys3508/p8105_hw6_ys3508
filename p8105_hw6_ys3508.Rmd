@@ -127,6 +127,7 @@ logistic %>%
 
 ```
 
+### Nesting city
 ```{r}
 nest_city = homicide %>%  
   nest(df = -city_state) %>% 
@@ -144,5 +145,18 @@ nest_city %>%
   knitr::kable(digits = 3, 
         col.names = c("Term", "Estimated adjusted OR", "CI lower bound", "CI upper bound")) 
 
+```
+
+### Plot that shows the estimated ORs and CIs
+```{r}
+nest_city %>% 
+  mutate(city_state = fct_reorder(city_state, OR)) %>%
+  ggplot(aes(x = city_state, y = OR)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = CI_lower, ymax = CI_upper)) +
+  labs(x = "City and state", 
+       y = "Estimated OR with CI",
+       title = "Solving homicides comparing male victims to female victims in each city \nEstimated Adjusted OR with 95% CI") +
+  theme(axis.text.x = element_text(angle = 80, hjust = 1))
 ```
 
