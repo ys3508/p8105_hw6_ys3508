@@ -195,6 +195,6 @@ birthweight <- birthweight %>%
 ```
 
 ```{r}
-
+sum(is.na(birthweight))
 ```
 
