@@ -279,8 +279,22 @@ ggsave(
   plot2,
   filename = "figures/plot2.png")
 ```
-### Cross Validation
+### Cross validation
 ```{r}
-
+cv_df = 
+  crossv_mc(birthweight, 100) %>% 
+    mutate(
+        train = map(train, as_tibble),
+        test = map(test,as_tibble)
+    )  %>%
+  mutate(
+    my_model_fit  = map(train, ~lm(bwt ~  bhead + blength + gaweeks + mrace + parity + ppbmi + smoken,
+                                 data = birthweight)),
+    model1_fit  = map(train, ~lm(bwt ~ blength + gaweeks, data = birthweight)),
+    model2_fit  = map(train, ~lm(bwt ~ blength + bhead + babysex + blength*bhead + blength* babysex + bhead*babysex + blength*bhead*babysex, data = birthweight))) %>% 
+  mutate(
+    rmse_my_model = map2_dbl(my_model_fit, test, ~rmse(model = .x, data = .y)),
+    rmse_model1 = map2_dbl(model1_fit , test, ~rmse(model = .x, data = .y)),
+    rmse_model2 = map2_dbl(model2_fit, test, ~rmse(model = .x, data = .y))) 
 ```
 
