@@ -117,10 +117,10 @@ logistic = homicide %>%
     glm(status ~ victim_age + victim_race + victim_sex, data = ., family = "binomial") 
     
 logistic %>% 
-    broom::tidy(conf.int = T) %>% 
+    broom::tidy() %>% 
   mutate(OR = exp(estimate),
-         CI_lower = exp(exp(conf.low)),
-         CI_upper = exp(exp(conf.high))) %>% 
+         CI_lower = exp(estimate - 1.96 * std.error),
+         CI_upper = exp(estimate + 1.96 * std.error)) %>% 
   select(term, estimate, OR, CI_lower,CI_upper) %>% 
   knitr::kable(digits = 3, 
         col.names = c("Term", "Log(OR)", "Estimated adjusted OR", "CI lower bound", "CI upper bound"))
@@ -128,13 +128,21 @@ logistic %>%
 ```
 
 ```{r}
-homicide %>%  
+nest_city = homicide %>%  
   nest(df = -city_state) %>% 
   mutate(models = map(.x = df, ~ glm(status ~ victim_age + victim_race + victim_sex, data = .x, family = "binomial")),
     results = map(models, broom::tidy)) %>% 
   select(city_state, results) %>% 
-   unnest(results)  
- 
+   unnest(results) %>% 
+  mutate(OR = exp(estimate),
+         CI_lower = exp(estimate - 1.96 * std.error),
+         CI_upper = exp(estimate + 1.96 * std.error)) %>% 
+  filter(term == "victim_sexMale") %>% 
+  select(city_state, OR, CI_lower,CI_upper)
+
+nest_city %>% 
+  knitr::kable(digits = 3, 
+        col.names = c("Term", "Estimated adjusted OR", "CI lower bound", "CI upper bound")) 
 
 ```
 
