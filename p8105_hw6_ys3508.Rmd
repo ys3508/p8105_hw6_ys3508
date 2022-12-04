@@ -149,7 +149,7 @@ nest_city %>%
 
 ### Plot that shows the estimated ORs and CIs
 ```{r}
-nest_city %>% 
+plot <-nest_city %>% 
   mutate(city_state = fct_reorder(city_state, OR)) %>%
   ggplot(aes(x = city_state, y = OR)) +
   geom_point() +
@@ -158,5 +158,43 @@ nest_city %>%
        y = "Estimated OR with CI",
        title = "Solving homicides comparing male victims to female victims in each city \nEstimated Adjusted OR with 95% CI") +
   theme(axis.text.x = element_text(angle = 80, hjust = 1))
+
+plot
+ggsave(
+  plot,
+  filename = "figures/plot.png")
+
+```
+
+## Problem 3
+### Load and clean data
+```{r}
+birthweight = read_csv("./data/birthweight.csv")
+
+birthweight <- birthweight %>% 
+  janitor::clean_names() %>%
+  mutate(babyset = as.factor(babysex),
+         frace = as.factor(frace),
+         malform = as.factor(malform),
+         mrace = as.factor(mrace)) %>% 
+  mutate(babysex = recode(babysex, "1" = "male", "2" = "female"),
+         frace = recode(frace, 
+                        "1" = "White", 
+                        "2" = "Black", 
+                        "3" = "Asian", 
+                        "4" = "Puerto Rican", 
+                        "8" = "Other", 
+                        "9" = "Unknown"),
+         malform = recode(malform, "0" = "absent", "1" = "present"),
+         mrace = recode(mrace, 
+                        "1" = "White", 
+                        "2" = "Black", 
+                        "3" = "Asian", 
+                        "4" = "Puerto Rican", 
+                        "8" = "Other"))
+```
+
+```{r}
+
 ```
 
